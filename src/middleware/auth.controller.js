@@ -1,12 +1,13 @@
-var jwt = require('jsonwebtoken');
-var bcrypt = require('bcryptjs');
-var config = require('../config');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const config = require('../config');
+const Account = require('../models/account.model');
+const Director = require('../models/director.model'); 
+
 var User = require('../models/user.model');
-var UserA = require('../models/userA');
-var UserB = require('../models/userB');
 
 const EXPIRE_24_HRS = 86400;
-// separate login
+
 function isValidPassword(receivedPass, savedPass) {
 	return bcrypt.compareSync(receivedPass, savedPass);
 }
@@ -14,53 +15,31 @@ function isValidPassword(receivedPass, savedPass) {
 exports.register = function (req, res) {
 	var salt = bcrypt.genSaltSync(); // using default parameters
 	var hashedPassword = bcrypt.hashSync(req.body.password, salt);
-	var newUser;
-
-	if (req.body.type == 'A') {
-		newUser = new UserA(
-			{
-				class : 'a class'
-			}
-		);
-	} else {
-		newUser = new UserB(
-			{
-				school : 'a school'
-			}
-		);
-	}
+	
+	let newUser = new Director(
+        {
+            name: req.body.name,
+        }
+    );
 
 	newUser.save(function (err) {
 		if (err) {
             return res.status(500).send("There was a problem registering the user.")
 		}
-		var user;
-		if (req.body.type == 'A') {
-			user = new User(
-				{
-					name : req.body.name,
-					email : req.body.email,
-					password : hashedPassword,
-					_userA: newUser._id
-				}
-			);
-		} else {
-			user = new User(
-				{
-					name : req.body.name,
-					email : req.body.email,
-					password : hashedPassword,
-					_userB: newUser._id
-				}
-			);
-		}
-
-		user.save(function (err) {
+		let newAccount = new Account(
+            {
+                email: req.body.email,
+                password: hashedPassword,
+                _director: newUser._id
+            }
+		);
+		
+		newAccount.save(function (err) {
 			if (err) {
 				return res.status(500).send("There was a problem registering the user.")
 			}
-			
-			var token = jwt.sign({ id: user._id, uA: user._userA, uB: user._userB }, config.secret, {
+
+			var token = jwt.sign({ id: newAccount._id, director: newAccount._director }, config.secret, {
 				expiresIn: EXPIRE_24_HRS
 			});
 			res.status(200).send({ auth: true, token: token });
@@ -69,8 +48,8 @@ exports.register = function (req, res) {
 };
 
 exports.get_me = function (req, res) {
-	User.findById(req.userId, { password: 0 }, function (err, user) {
-		if (err) {
+	Account.findById(req.userId, { password: 0 }, function (err, user) {
+		if (err) {User
 			return res.status(500).send("There was a problem finding the user.");
 		}
 		if (!user) {
@@ -81,7 +60,7 @@ exports.get_me = function (req, res) {
 };
 
 exports.login = function (req, res) {
-	User.findOne({ email: req.body.email }, function (err, user) {
+	Account.findOne({ email: req.body.email }, function (err, user) {
 		if (err) {
 			return res.status(500).send('Error on the server.');
 		}
