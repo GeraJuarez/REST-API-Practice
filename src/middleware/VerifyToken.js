@@ -12,13 +12,13 @@ exports.has_token = function (req, res, next) {
       		return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
     	}
       
-    	// if everything good, save to request for use in other routes
-    	req.userId = decoded.id;
+    	req.accountId = decoded.id;
     	next();
   });
 }
 
-exports.is_A = function (req, res, next) {
+
+exports.isDirector = function (req, res, next) {
 	var token = req.headers['x-access-token'];
   
 	jwt.verify(token, config.secret, function(err, decoded) {
@@ -26,12 +26,12 @@ exports.is_A = function (req, res, next) {
 			return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
 		}
 
-		if (!decoded.uA) {
+		if (!decoded.director) {
 			return res.status(403).send({ auth: false, message: 'No authorization' });
 		}
 
-		// if everything good, save to request for use in other routes
-		req.userId = decoded.id;
+		req.accountId = decoded.id;
+		req.userId = decoded.director;
 		next();
 	});
 }
