@@ -11,7 +11,6 @@ exports.create = function (req, res) {
                 startTime: req.body.startTime,
                 endTime: req.body.endTime
             },
-            schedule: req.body.schedule,
             _students: req.body.students,
             _course: req.body.course,
             _professor: req.body.professor,
@@ -21,14 +20,16 @@ exports.create = function (req, res) {
 
 	group.save(function (err) {
 		if (err) {
-            return res.status(500).send("There was a problem creating")
+            return res.status(500).send(err);
 		}
         res.status(200).send(group);
 	});
 };
 
 exports.getAll = function (req, res) {
-    Group.find({}, function (err, group) {
+    Group.find({})
+    .populate('_professor')
+    .exec(function (err, group) {
         if (err) { 
             return res.status(500).send("There was a problem finding");
         }
@@ -58,10 +59,10 @@ exports.delete = function (req, res) {
 };
 
 exports.update = function (req, res) {
-    Group.findByIdAndUpdate(req.params.id, req.body, {new: true}, function (err, course) {
+    Group.findByIdAndUpdate(req.params.id, req.body, {new: true}, function (err, group) {
         if (err) {
-            return res.status(500).send("There was a problem updating the course.");
+            return res.status(500).send("There was a problem updating the group.");
         }
-        res.status(200).send(course);
+        res.status(200).send(group);
     });
 }

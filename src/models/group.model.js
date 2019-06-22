@@ -3,13 +3,13 @@ const Schema = mongoose.Schema;
 const hourRegex = '^[0-24]:[0-59]$';
 
 const GroupSchema = new Schema({  
-    shedule: {
-        startTime: {type: String, match: hourRegex},
-        endTime: {type: String, match: hourRegex}
+    schedule: {
+        startTime: String,
+        endTime: String
     },
     name: {
-        number: {type: String, match: '^[1-9]$'},
-        letter: {type: String, match: '^[a-zA-Z]$'}
+        number: {type: String, match: /^[1-9]$/},
+        letter: {type: String, match: /^[a-zA-Z]$/}
     },
     _students: [{ type: Schema.Types.ObjectId, ref:'Students' }],
 	_course:{ type: Schema.Types.ObjectId, ref:'Course' },
@@ -25,7 +25,7 @@ const GroupSchema = new Schema({
 });
 
 GroupSchema.virtual('name.full').get(function () {
-    return this.name.number + ' ' + this.name.letter;
+    return this.name.number + '' + this.name.letter;
 });
 
 module.exports = mongoose.model('Group', GroupSchema);
