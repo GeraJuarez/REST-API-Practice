@@ -11,6 +11,7 @@ const professor = require('./routes/professor.route');
 const course = require('./routes/course.route');
 const classroom = require('./routes/classroom.route');
 const group = require('./routes/group.route');
+const grade = require('./routes/grade.route');
 
 var app = express();
 
@@ -24,5 +25,6 @@ app.use('/api/professors', professor);
 app.use('/api/courses', course);
 app.use('/api/classrooms', classroom);
 app.use('/api/groups', group);
+app.use('/api/grades', grade);
 
 module.exports = app;
