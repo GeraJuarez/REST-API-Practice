@@ -4,8 +4,6 @@ const config = require('../config');
 const Account = require('../models/account.model');
 const Director = require('../models/director.model'); 
 
-var User = require('../models/user.model');
-
 const EXPIRE_24_HRS = 86400;
 
 function isValidPassword(receivedPass, savedPass) {

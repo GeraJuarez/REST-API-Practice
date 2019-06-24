@@ -7,4 +7,4 @@ const GroupSchema = new Schema({
 	_course:{ type: Schema.Types.ObjectId, ref:'Course' }
 });
 
-module.exports = mongoose.model('Group', GroupSchema);
+module.exports = mongoose.model('Grade', GroupSchema);
